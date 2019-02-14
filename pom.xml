@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.codenjoy</groupId>
+        <artifactId>games</artifactId>
+        <version>1.0.27</version>
+    </parent>
+
+    <artifactId>${module.name}-engine</artifactId>
+
+    <properties>
+        <module.name>snakebattle</module.name>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>codenjoy-releases</id>
+            <url>https://github.com/codenjoyme/codenjoy-repo/raw/master/snapshots</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easytesting</groupId>
+            <artifactId>fest-assert</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easytesting</groupId>
+            <artifactId>fest-reflect</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.11.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.11.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.7</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>27.0.1-jre</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <!-- For Lombok generation -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-maven-plugin</artifactId>
+                            <version>1.18.4.0</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <!-- Build an executable JAR -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.codenjoy.dojo.snakebattle.client.SnakeBotApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.codenjoy.dojo.snakebattle.client.SnakeBotApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>assemble-all</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <configuration>
+                            <target>
+                                <zip destfile="${user.resources}/${module.name}-servers-java.zip"
+                                     basedir="."
+                                     includes="src/main/java/com/codenjoy/dojo/${module.name}/client/*.java,
+                                               src/main/java/com/codenjoy/dojo/${module.name}/model/Elements.java,
+                                               src/test/java/com/codenjoy/dojo/${module.name}/client/*.java,
+                                               README.*,
+                                               src/license/**,
+                                               **/pom.xml"
+                                     excludes="src/main/java/com/codenjoy/dojo/${module.name}/client/ai/*,
+                                               src/test/java/com/codenjoy/dojo/${module.name}/client/ai/*,
+                                               **/target/**"
+                                     update="true"/>
+
+                                <zip destfile="${user.resources}/${module.name}-servers-js.zip"
+                                     basedir="src/main/javascript"
+                                     includes="**"
+                                     update="true"/>
+
+                                <zip destfile="${user.resources}/${module.name}-servers-js.zip"
+                                     basedir="."
+                                     includes="src/license/**"
+                                     update="true"/>
+
+                                <zip destfile="${project.build.directory}/${project.artifactId}.jar"
+                                     basedir="src/main/webapp"
+                                     includes="resources/user/${module.name}-servers-js.zip,
+                                               resources/user/${module.name}-servers-java.zip"
+                                     excludes=""
+                                     update="true"/>
+
+                                <zip destfile="${project.build.directory}/${project.artifactId}-sources.jar"
+                                     basedir="src/main/webapp"
+                                     includes="resources/user/${module.name}-servers-js.zip,
+                                               resources/user/${module.name}-servers-java.zip"
+                                     excludes=""
+                                     update="true"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
